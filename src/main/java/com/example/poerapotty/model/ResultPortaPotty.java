@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -35,7 +36,9 @@ public class ResultPortaPotty {
     private List<Camps> camps;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "result")
     @JsonIgnore
+    @Size(min = 3)
     private List<Person> persons;
+    private Boolean consumed;
 
     public ResultPortaPotty(ResultPortaPottyPostDto dto) {
         this.name = dto.name();
@@ -43,6 +46,7 @@ public class ResultPortaPotty {
         this.sexOrientation = dto.sexOrientation();
         this.camps = pickCamps();
         System.out.println(this.camps);
+        this.consumed = false;
     }
 
     private static List<Camps> pickCamps() {

@@ -10,4 +10,9 @@ public interface PersonRespository extends JpaRepository<Person, Long> {
             SELECT * FROM tb_person WHERE tb_person.consumed=0 ORDER BY RAND() LIMIT 3                        
             """,nativeQuery = true)
     List<Person> findRandom();
+
+    @Query(value = """
+            SELECT * FROM tb_person WHERE result is NULL AND consumed=false ORDER BY RAND() LIMIT 3         
+            """, nativeQuery = true)
+    List<Person> findSpecificRandom();
 }

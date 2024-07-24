@@ -23,27 +23,30 @@ public class ResultService {
         return ResponseEntity.created(uri).body(new ResultResponseDTO(savedOne));
     }
 
-    public ResponseEntity<Page<ResultResponseDTO>> getAll(Pageable pageable) {
-        var allFound = resultRepository.findAll(pageable).map(ResultResponseDTO::new);
+    public ResponseEntity<Page<ResultResponseGetAllDTO>> getAll(Pageable pageable) {
+        var allFound = resultRepository.findAll(pageable).map(ResultResponseGetAllDTO::new);
         return ResponseEntity.ok(allFound);
     }
 
     public ResponseEntity result() {
-        var foundRandoms = personRespository.findRandom();
+//        var foundRandoms = personRespository.findRandom();
+        var foundRandoms = personRespository.findSpecificRandom();
         System.out.println(foundRandoms.size());
         var result = resultRepository.findRandom();
         Integer sizeRule = 3;
-        if (foundRandoms.size()>sizeRule){
-            return ResponseEntity.badRequest().body(">3");
-        }
         foundRandoms.forEach(
-                random->{
-                    random.turnIntoTrue();
-                    random.setResult(result);
-                    personRespository.save(random);
+                random -> {
+                    if (random.getResult() == null && foundRandoms.size() == sizeRule) {
+                        random.turnIntoTrue();
+                        random.setResult(result);
+                        personRespository.save(random);
+                    } else {
+                        throw new RuntimeException("Erro list of persons");
+                    }
                 }
         );
         result.setPersons(foundRandoms);
+        result.setConsumed(true);
         ResultPortaPotty updatedOne = resultRepository.save(result);
         return ResponseEntity.ok().body(new ResultResponseDTO(updatedOne));
     }
